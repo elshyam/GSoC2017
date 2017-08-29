@@ -1,0 +1,110 @@
+	FILE                    STATUS                         COMMENTS
+	
+1] nft-table-add.c		OK                       "./nft-table-add ip/ip6/arp/bridge x" creates table ip x, ip6 x, arp x and bridge x      
+2] nft-table-del.c		OK                       "./nft-table-del ip/ip6/arp/bridge x" deletes table ip x, ip6 x, arp x and bridge x
+3] nft-table-get.c		Ok
+4] nft-table-parse-add.c	  patch required	"./nft-table-parse-add json rules.json"
+							output: "Unable to parse file: Node "table" not found"
+
+5] nft-table-upd.c                 OK	               "./nft-table-upd ip x dormant/active works fine"
+
+
+6] nft-chain-add.c                 Ok                    "./nft-chain-add arp x z NF_INET_PRE_ROUTING -3" creates base chain z of arp family
+
+7] nft-chain-del.c                 OK                   "./nft-chain-del arp x z" deletes chain named z of arp family
+
+8] nft-chain-get.c                 OK                  "./nft-chain-get ip x y"
+							output: ip x y use 0 type filter hook input prio 0 policy accept packets 664 bytes 175057
+
+                                                       ./nft-chain-get ip x y json
+							output; {"chain":{"name":"y","handle":1,"bytes":184804,"packets":736,"table":"x","family":"ip","use":0,
+                                                                "type":"filter","hooknum":"input","prio":0,"policy":"accept"}}
+
+9] nft-chain-parse-add.c    patch required           "./nft-chain-parse-add json test.json" 
+					         	Unable to parse file: Node "chain" not found
+ 
+10] nft-compat-get.c                OK               "./nft-compat-get  cgroup match 1"
+                                                     requesting `cgroup' rev=1 type=0
+                                                     name=cgroup rev=1 type=1 
+
+					       
+					             "./nft-compat-get  cgroup match 2"
+				                     requesting `cgroup' rev=2 type=0
+                                                     error: Protocol not supported
+
+						     "./nft-compat-get  CONNMARK target 1"
+						      requesting `CONNMARK' rev=1 type=1
+						      name=CONNMARK rev=1 type=1 
+
+						     "./nft-compat-get  CONNMARK target 2"
+					              requesting `CONNMARK' rev=2 type=1
+					              error: Protocol not supported
+
+
+11] nft-obj-add.c                  OK                 "./nft-obj-add ip x foo" works fine and add counter named foo in ip table x 
+
+12] nft-obj-del.c		   OK		      "./nft-obj-del ip x foo" deletes foo object
+
+13] nft-obj-get.c		 Unconfirmed for xml     "./nft-obj-get ip x bar"
+						         table x name bar use 0 [ counter pkts 0 bytes 0 ]
+ 
+						       "./nft-obj-get ip x bar json"
+						       {"table":{"name":"bar","name":"bar","family":"ip","use":0}}
+ 
+14] nft-map-add.c		OK		        "./nft-map-add  ip x a" works fine	
+						         Result below
+						         map a {
+						         type inet_service : inet_service
+						         flags constant
+					        	}
+	
+
+15] nft-rule-add.c     Patch required                   "./nft-rule-add ip x y"
+						         Rule added: tcp dport ssh counter packets 0 bytes 0
+						
+					        	"./nft-rule-add ip6 x y"
+						         Rule added: payload @nh,72,8 0x6 [invalid type] payload @th,16,16 0x16 \
+							    [invalid type] counter packets 0 bytes 0	
+
+16] nft-rule-del.c             OK			"./nft-rule-del ip x y 2" works fine
+
+
+17] nft-rule-get.c             OK                       "./nft-rule-get ip x y"   returns --debug=netlink output for tcp dport ssh
+
+18] nft-rule-parse-add.c     patch required	       "./nft-rule-parse-add  json test.json" 
+						       Unable to parse file: Node "rule" not found
+
+19] nft-ruleset-get.c              OK			"./nft-ruleset-get" returns --debug=netlink output along with some other info
+
+ 
+20] nft-ruleset-parse-file.c      patch required     "./nft-ruleset-parse-file test.json" 
+							fail: Node "table" not found
+
+21] nft-set-add.c                 OK	              "./nft-set-add ip/ip6/bridge/arp x set1"
+
+22] nft-set-del.c                 patch required      "./nft-set-del ip x set3"
+						      output: "error: Invalid argument"
+
+23] nft-set-elem-add.c           OK                   "./nft-set-elem-add ip x set1"
+							 Element order is different  "elements = { 256, exec} and elements = { exec, 256}"
+
+24] nft-set-elem-del.c         patch required         "./nft-set-elem-del  ip table set1"
+						       error: Invalid argument
+
+25] nft-set-elem-get.c          OK                     "./nft-set-elem-get ip x set1 json"
+							{"set":{"name":"set1","table":"x","family":"ip","set_elem":[{"key":{"reg":{"type":"value","len                                                                                                                           ":2,"data0":"0x00000001"}}},{"key":{"reg":{"type":"value","len":2,"data0":"0x00000002"}}}]}}
+						        {"set":{"name":"set1","table":"x","family":"ip"}}
+
+26] nft-set-get.c               OK			"./nft-set-get ip json"
+							{"set":{"name":"set1","table":"x","family":"ip","key_type":13,"key_len":2}}
+							{"set":{"name":"set2","table":"x","family":"ip","key_type":13,"key_len":2}}
+
+27] nft-set-parse-add.c         patch required		./nft-set-parse-add json sets_test.json 
+							 Unable to parse file: Node "set" not found 
+
+28] nft-events.c                 OK                        Please check ruleset_nft_events.nft file for all rules tested
+
+
+
+
+

@@ -1,0 +1,56 @@
+table ip mangle {
+	chain prerouting {
+		type filter hook prerouting priority 0; policy accept;
+		dup to 172.20.0.2
+		ip saddr 192.168.1.100 ip daddr 192.168.1.1 counter packets 0 bytes 0
+		tcp flags != syn counter packets 619772 bytes 389570486
+		icmp type echo-request counter packets 0 bytes 0 drop
+		ct state established,related accept
+		iifname "lo" accept
+		icmp type echo-request accept
+		tcp dport { http, ssh} accept
+	}
+}
+table ip6 x {
+	set set1 {
+		type ipv6_addr
+	}
+
+	chain y {
+		type nat hook postrouting priority 0; policy accept;
+		ip6 daddr fe00::1-fe00::200 udp dport domain counter packets 0 bytes 0 masquerade
+		ip6 daddr fe00::1-fe00::200 udp dport domain counter packets 0 bytes 0 masquerade
+		meta l4proto tcp masquerade to :1024
+		iifname "wlan0" ct state established,new tcp dport vmap { 222 : drop, ssh : drop} masquerade
+		iifname "wlan0" ct state established,new tcp dport vmap { 222 : drop, ssh : drop} masquerade
+		ip6 daddr fe00::1-fe00::200 udp dport domain counter packets 0 bytes 0 masquerade
+		iifname "eth0" ct state established,new tcp dport vmap { 222 : drop, ssh : drop} masquerade
+		tcp dport ssh ip6 daddr 1::2 ether saddr 00:0f:54:0c:11:04 accept
+		icmpv6 id 33-45
+		icmpv6 id 33-45
+	}
+}
+table arp x {
+	chain y {
+		arp operation { request, reply, inreply, inrequest, nak, rrequest, rreply}
+		arp operation { rreply, nak, reply, inreply, request, inrequest, rrequest}
+		arp operation != rrequest
+		arp ptype ip
+		arp hlen 33-45
+		arp htype 22
+		arp operation != inrequest
+	}
+}
+table bridge x {
+	chain y {
+		type filter hook input priority 0; policy accept;
+		ether daddr 00:01:02:03:04:05 ether saddr set ff:fe:dc:ba:98:76 drop
+		ether daddr 00:01:02:03:04:05 ether saddr set ff:fe:dc:ba:98:76 drop
+		vlan id 4094 vlan cfi 0
+		vlan id 4094
+		vlan id 4094
+		vlan id 1 ip saddr 10.0.0.0/23 udp dport domain
+		vlan id 1 ip saddr 10.0.0.0/23 udp dport domain
+		ether type ip reject with icmp type host-unreachable
+	}
+}
